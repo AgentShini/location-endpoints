@@ -52,13 +52,10 @@ const geocodeAddress = async (address) => {
     return allAddresses;
 };
 
-// Function to format timestamp to a readable format
-const formatTimestamp = (timestamp) => {
-    return new Date(timestamp).toLocaleString();
-  };
+
 
 
 
 module.exports = {
-    getAllAddresses, geocodeAddress , formatTimestamp, OSM_API_URL 
+    getAllAddresses, geocodeAddress, OSM_API_URL 
 }

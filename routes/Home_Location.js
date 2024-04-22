@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const HomeLocation = require("../models/HomeLocation");
-const {geocodeAddress,formatTimestamp} = require("../Helpers/Constants");
+const {geocodeAddress} = require("../Helpers/Constants");
 
 
 // Endpoint to save user home location
-router.post('/user/home_location', async (req, res) => { //DONE !!!!!
+router.post('/user/home_location', async (req, res) => {
     const { userId, address } = req.body;
   
     // Validate request body
@@ -21,7 +21,7 @@ router.post('/user/home_location', async (req, res) => { //DONE !!!!!
             latitude,
             longitude,
             address,
-            timestamp:formatTimestamp(Date.now())
+            timestamp:Date.now()
         });
         await newHomeLocation.save();
 
@@ -33,7 +33,7 @@ router.post('/user/home_location', async (req, res) => { //DONE !!!!!
   });
 
 // Endpoint to update user location
-router.put('/user/home_location/:userId', async (req, res) => { //DONE !!!!!!!!!!!!
+router.put('/user/home_location/:userId', async (req, res) => {
   const userId = req.params.userId;
   const { address } = req.body;
 
@@ -57,19 +57,19 @@ router.put('/user/home_location/:userId', async (req, res) => { //DONE !!!!!!!!!
     existingUserLocation.address = address;
     existingUserLocation.latitude = latitude;
     existingUserLocation.longitude = longitude;
-    existingUserLocation.timestamp = formatTimestamp(Date.now()); // Update timestamp
+    existingUserLocation.timestamp = Date.now(); // Update timestamp
 
     // Save the updated user home location document to the database
     await existingUserLocation.save();
     res.status(201).json({ message: 'User home location updated successfully', HomeLocation:existingUserLocation  });
 } catch (error) {
     console.error('Error:', error.message);
-    res.status(500).json({ error: 'Failed to update user home location' });
+    res.status(500).json({ error: 'Failed to update User home location' });
 }
 });
 
 // Endpoint to get user location
-router.get('/user/home_location/:userId', async(req, res) => {//DONE !!!!!!
+router.get('/user/home_location/:userId', async(req, res) => {
   const userId = req.params.userId;
 
   try {

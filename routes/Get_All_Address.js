@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const getAllAddresses = require("../Helpers/Constants");
+const {getAllAddresses} = require("../Helpers/Constants");
 
 // Function to retrieve all addresses for a given query
 

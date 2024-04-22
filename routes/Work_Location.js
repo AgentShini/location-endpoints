@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const WorkLocation = require("../models/WorkLocation");
-const {geocodeAddress,formatTimestamp} = require("../Helpers/Constants");
+const {geocodeAddress} = require("../Helpers/Constants");
 
 
 
 // Endpoint to save user work location
-router.post('/user/work_location', async (req, res) => {//DONE !!!!!!!!
+router.post('/user/work_location', async (req, res) => {
     const { userId, address } = req.body;
   
     // Validate request body
@@ -21,7 +21,7 @@ router.post('/user/work_location', async (req, res) => {//DONE !!!!!!!!
             latitude,
             longitude,
             address,
-            timestamp:formatTimestamp(Date.now())
+            timestamp:Date.now()
         });
         await newWorkLocation.save();
         res.status(201).json({ message: 'User work location saved successfully', newWorkLocation });
@@ -31,8 +31,8 @@ router.post('/user/work_location', async (req, res) => {//DONE !!!!!!!!
     }
   });
 
-// Endpoint to update user location
-router.put('/user/work_location/:userId', async (req, res) => {//DONE !!!!!
+// Endpoint to update user work location
+router.put('/user/work_location/:userId', async (req, res) => {
   const userId = req.params.userId;
   const { address } = req.body;
 
@@ -56,9 +56,9 @@ router.put('/user/work_location/:userId', async (req, res) => {//DONE !!!!!
     existingUserLocation.address = address;
     existingUserLocation.latitude = latitude;
     existingUserLocation.longitude = longitude;
-    existingUserLocation.timestamp = formatTimestamp(Date.now()); // Update timestamp
+    existingUserLocation.timestamp = Date.now(); // Update timestamp
 
-    // Save the updated user home location document to the database
+    // Save the updated user work location document to the database
     await existingUserLocation.save();
     res.status(201).json({ message: 'User work location updated successfully', WorkLocation:existingUserLocation  });
 }  catch (error) {
@@ -67,8 +67,8 @@ router.put('/user/work_location/:userId', async (req, res) => {//DONE !!!!!
 }
 });
 
-// Endpoint to get user location
-router.get('/user/work_location/:userId', async(req, res) => { //DONE !!!!!!
+// Endpoint to get user work location
+router.get('/user/work_location/:userId', async(req, res) => {
   const userId = req.params.userId;
 
   try {
