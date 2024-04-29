@@ -4,9 +4,8 @@ const app = express();
 const port = 3000;
 const mongoose = require('mongoose');
 var getAllAddresses = require("./routes/Get_All_Address");
-var homeLocation = require("./routes/Home_Location");
-var workLocation = require("./routes/Work_Location");
-var riderDistance = require("./routes/RiderDistance");
+var userLocation = require("./routes/User_Location");
+var riderDistance = require("./routes/Rider_Distance");
 
  mongoose.connect("mongodb://localhost:27017/locations");
  mongoose.connection.on('connected', (err) => {
@@ -18,7 +17,7 @@ var riderDistance = require("./routes/RiderDistance");
 });
 
 app.use(bodyParser.json());
-app.use("/api",getAllAddresses,homeLocation,workLocation,riderDistance);
+app.use("/api",getAllAddresses,userLocation,riderDistance);
 
 
 app.listen(port, () => {
