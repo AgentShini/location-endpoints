@@ -1,29 +1,32 @@
 
 const axios = require('axios');
+const NodeGeocoder = require('node-geocoder');
 
    // OpenStreetMap API endpoint
 const OSM_API_URL = 'https://nominatim.openstreetmap.org/search';
 
+// Configure the geocoder with options
+const geocoder = NodeGeocoder({
+    provider: 'openstreetmap',
+    format: 'json'
+});
+
 const geocodeAddress = async (address) => {
     try {
-        const response = await axios.get(OSM_API_URL, {
-            params: {
-                q: address,
-                format: 'json',
-                limit: 1
-            }
-        });
-  
-        if (response.data.length === 0) {
+        // Geocode the address
+        const result = await geocoder.geocode(address, { limit: 1 });
+
+        if (result.length === 0) {
             throw new Error('Address not found');
         }
-  
-        const location = response.data[0];
-        return { latitude: parseFloat(location.lat), longitude: parseFloat(location.lon) };
+
+        // Extract latitude and longitude from the result
+        const { latitude, longitude } = result[0];
+        return { latitude, longitude };
     } catch (error) {
         throw new Error('Failed to geocode address');
     }
-  };
+};
   
 
   const getAllAddresses = async (query) => {
