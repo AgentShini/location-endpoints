@@ -17,6 +17,7 @@
     "geolib": "^3.3.4",
     "mongoose": "^8.3.2",
     "node-fetch": "^3.3.2",
+    "node-open-geocoder": "^4.0.1",
     "nodemon": "^3.1.0"
   }
 }

@@ -17,8 +17,12 @@ router.get('/distance', async(req, res) => {
   
     try {
         // Geocode rider and customer addresses
-        const riderLocation = await geocodeAddress(riderAddress);
-        const customerLocation = await geocodeAddress(customerAddress);
+       
+            const [riderLocation, customerLocation] = await Promise.all([
+                geocodeAddress(riderAddress),
+                geocodeAddress(customerAddress)
+            ]);
+           
 
         // Calculate distance between geocoded locations
         const distance = geolib.getDistance(
