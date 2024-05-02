@@ -1,7 +1,7 @@
 const axios = require('axios');  
- // OpenStreetMap API endpoint
-const OSM_API_URL = 'https://nominatim.openstreetmap.org/search';
 const geocoder = require('node-open-geocoder');
+ // OpenStreetMap API endpoint
+ const OSM_API_URL = 'https://nominatim.openstreetmap.org/search';
 
 const geocodeAddress = (address) => {
     return new Promise((resolve, reject) => {
@@ -19,30 +19,36 @@ const geocodeAddress = (address) => {
             });
     });
 };
-  const getAllAddresses = async (query) => {
-    const allAddresses = [];
-    let page = 1;
-    let hasNextPage = true;
+const getAllAddresses = (query) => {
+    return new Promise((resolve, reject) => {
+        const allAddresses = [];
+        let page = 1;
+        let hasNextPage = true;
 
-    while (hasNextPage) {
-        try {
-            const response = await axios.get(OSM_API_URL, {
+        const fetchPage = () => {
+            axios.get(OSM_API_URL, {
                 params: { q: query, format: 'json', page }
+            }).then(response => {
+                const addresses = response.data.map(item => ({ address: item.display_name }));
+                allAddresses.push(...addresses);
+
+                // If there are more pages, continue fetching
+                hasNextPage = response.headers['x-ratelimit-remaining'] > 0; // Check if there are remaining requests
+                page++;
+
+                if (hasNextPage) {
+                    fetchPage(); // Fetch the next page
+                } else {
+                    resolve(allAddresses); // Resolve with the final result
+                }
+            }).catch(error => {
+                console.error('Error:', error.message);
+                reject(new Error('Failed to retrieve addresses')); // Reject with an error
             });
+        };
 
-            const addresses = response.data.map(item => ({ address: item.display_name }));
-            allAddresses.push(...addresses);
-
-            // If there are more pages, continue fetching
-            hasNextPage = response.headers['x-ratelimit-remaining'] > 0; // Check if there are remaining requests
-            page++;
-        } catch (error) {
-            console.error('Error:', error.message);
-            throw new Error('Failed to retrieve addresses');
-        }
-    }
-
-    return allAddresses;
+        fetchPage(); // Start fetching the first page
+    });
 };
 
 

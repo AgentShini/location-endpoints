@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const UserProfile= require("../models/UserProfile");
-const {geocodeAddress} = require("../Helpers/Constants");
 
 
 
@@ -19,9 +18,6 @@ router.post('/user/location', async (req, res) => {
     }
 
     try {
-        const { latitude, longitude } = await geocodeAddress(address);
-
-
         let userProfile = await UserProfile.findOne({ userId });
 
         if (!userProfile) {
@@ -34,7 +30,7 @@ router.post('/user/location', async (req, res) => {
             userProfile.locations = new Map();
         }
 
-        userProfile.locations.set(category, { latitude, longitude, address });
+        userProfile.locations.set(category, { address });
         await userProfile.save();
         res.status(201).json({ message: 'User Profile', userProfile });
     } catch (error) {
@@ -61,12 +57,11 @@ router.put('/user/location', async (req, res) => {
         }
 
          // Geocode the new address to get latitude and longitude
-         const { latitude, longitude } = await geocodeAddress(address);
 
         // Update or set the location based on category
         const locationKey = category.toLowerCase();
         if (['home', 'work'].includes(locationKey)) {
-            userProfile.locations.set(category, { latitude, longitude, address });
+            userProfile.locations.set(category, { address });
         } else {
             return res.status(400).json({ error: 'Unsupported category' });
         }
