@@ -16,6 +16,7 @@
     "express": "^4.19.2",
     "geolib": "^3.3.4",
     "mongoose": "^8.3.2",
-    "node-open-geocoder": "^4.0.1"
+    "node-open-geocoder": "^4.0.1",
+    "pm2": "^5.3.1"
   }
 }
