@@ -1,5 +1,5 @@
-
-const axios = require('axios');   // OpenStreetMap API endpoint
+const axios = require('axios');  
+ // OpenStreetMap API endpoint
 const OSM_API_URL = 'https://nominatim.openstreetmap.org/search';
 const geocoder = require('node-open-geocoder');
 
