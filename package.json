@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "pm2 start index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -16,9 +16,6 @@
     "express": "^4.19.2",
     "geolib": "^3.3.4",
     "mongoose": "^8.3.2",
-    "node-fetch": "^3.3.2",
-    "node-open-geocoder": "^4.0.1",
-    "nodemon": "^3.1.0",
-    "uninstall": "^0.0.0"
+    "node-open-geocoder": "^4.0.1"
   }
 }
