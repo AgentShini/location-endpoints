@@ -6,7 +6,7 @@ const nominatimUrl = 'https://nominatim.openstreetmap.org/search';
 
 const geocoderOptions = {
   provider: 'osm', // Replace with your chosen provider if not OpenStreetMap
-  timeout: 10000, // Set timeout in milliseconds (default is 30 seconds)
+  timeout: 100000, // Set timeout in milliseconds (default is 30 seconds)
 };
 
 const geo = geocoder(geocoderOptions);
