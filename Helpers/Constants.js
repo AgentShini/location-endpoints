@@ -1,49 +1,40 @@
-const axios = require('axios');
+const axios = require('axios');  
 const geocoder = require('node-open-geocoder');
-
-// OpenStreetMap API endpoint (consider using a constant for clarity)
-const OSM_API_URL = 'https://nominatim.openstreetmap.org/search';
-
-const geocoderOptions = {
-  provider: 'osm', // Replace with your chosen provider if not OpenStreetMap
-  timeout: 100000, // Set timeout in milliseconds (default is 30 seconds)
+ // OpenStreetMap API endpoint
+ const OSM_API_URL = 'https://nominatim.openstreetmap.org/search';
+const options = {
+    timeout:100000
+}
+const geocodeAddress = (address) => {
+    return new Promise((resolve, reject) => {
+        geocoder()
+            .geocode(address,options)
+            .end((err, result) => {
+                if (err) {
+                    reject(new Error('Failed to geocode address'));
+                } else if (result.length === 0) {
+                    reject(new Error('Address not found'));
+                } else {
+                    const { lat, lon } = result[0];
+                    resolve({ latitude: parseFloat(lat), longitude: parseFloat(lon) });
+                }
+            });
+    });
 };
-
-const geo = geocoder(geocoderOptions);
-
-const geocodeAddress = async (address) => {
-  try {
-    const response = await geo.geocode(address);
-
-    if (response.length === 0) {
-      throw new Error('Address not found');
-    }
-
-    const { latitude, longitude } = response[0];
-    return { latitude: parseFloat(latitude), longitude: parseFloat(longitude) };
-  } catch (error) {
-    // Handle errors appropriately (e.g., log the error or throw a specific error)
-    console.error('Geocoding error:', error.message);
-    throw new Error('Geocoding failed'); // Or a more specific error message
-  }
+const getAllAddresses = (query) => {
+    return new Promise((resolve, reject) => {
+        geocoder()
+            .geocode(query,options)
+            .end((err, result) => {
+                if (err) {
+                    reject(new Error('Failed to retrieve addresses'));
+                } else {
+                    const addresses = result.map(item => ({ address: item.display_name }));
+                    resolve(addresses);
+                }
+            });
+    });
 };
-const getAllAddresses = async (query) => {
-    try {
-      const response = await geo.geocode(query);
-  
-      if (response.length === 0) {
-        throw new Error('No addresses found for the given query');
-      }
-  
-      const addresses = response.map(({ display_name }) => ({ address: display_name }));
-      return addresses;
-    } catch (error) {
-      // Handle errors appropriately (e.g., log the error or throw a specific error)
-      console.error('Geocoding error:', error.message);
-      throw new Error('Failed to retrieve addresses'); // Or a more specific error message
-    }
-  };
-  
 
 
 
