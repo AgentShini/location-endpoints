@@ -1,8 +1,8 @@
 const axios = require('axios');
-const geocoder = require('node-geocoder'); // Assuming this is the correct library
+const geocoder = require('node-open-geocoder');
 
 // OpenStreetMap API endpoint (consider using a constant for clarity)
-const nominatimUrl = 'https://nominatim.openstreetmap.org/search';
+const OSM_API_URL = 'https://nominatim.openstreetmap.org/search';
 
 const geocoderOptions = {
   provider: 'osm', // Replace with your chosen provider if not OpenStreetMap
