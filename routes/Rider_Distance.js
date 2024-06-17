@@ -1,42 +1,28 @@
 const express = require('express');
 const router = express.Router();
-const geolib = require('geolib');
-const {geocodeAddress} = require("../Helpers/Constants");
+const {geocodeAddress,haversineDistance} = require("../Helpers/Constants");
 
 
 // Endpoint to calculate distance between rider and customer
-router.get('/distance', async(req, res) => {
-    const { riderAddress, customerAddress } = req.body;
-
-    // Validate request body
-    if (!riderAddress || !customerAddress) {
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    
+router.get('/distance', async (req, res) => {
+    const { address1, address2 } = req.query;
   
-    try {
-        // Geocode rider and customer addresses
-       
-            const [riderLocation, customerLocation] = await Promise.all([
-                geocodeAddress(riderAddress),
-                geocodeAddress(customerAddress)
-            ]);
-           
-
-        // Calculate distance between geocoded locations
-        const distance = geolib.getDistance(
-            { latitude: riderLocation.latitude, longitude: riderLocation.longitude },
-            { latitude: customerLocation.latitude, longitude: customerLocation.longitude }
-        );
-
-        // Convert distance from meters to kilometers
-        const distanceInKm = geolib.convertDistance(distance, 'km');
-
-        res.json({ distanceInMeters: distance, distanceInKm });
-    } catch (error) {
-        console.error('Error:', error.message);
-        res.status(500).json({ error: 'Failed to calculate distance' });
+    if (!address1 || !address2) {
+      return res.status(400).json({ error: 'Please provide both address1 and address2 query parameters' });
+    }
+  
+    const location1 = await geocodeAddress(address1);
+    const location2 = await geocodeAddress(address2);
+  
+    if (location1 && location2) {
+      const distance = haversineDistance(location1, location2);
+      res.json({
+        address1: location1.formatted,
+        address2: location2.formatted,
+        distance: `${distance.toFixed(2)} kilometers`
+      });
+    } else {
+      res.status(500).json({ error: 'Failed to retrieve one or both addresses' });
     }
   });
 

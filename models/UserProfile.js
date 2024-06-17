@@ -3,7 +3,16 @@ const Schema = mongoose.Schema;
 
 
 const UserProfile = new Schema({
-    userId: { type: String, required: true },
+    userId: { type: String, 
+        required: true,
+        unique:true
+    },
+
+    email:{
+        type:String,
+        required: true,
+        unique:true
+    },
 
     locations: {
         type: Map,

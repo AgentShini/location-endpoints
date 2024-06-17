@@ -5,7 +5,7 @@ const {getAllAddresses} = require("../Helpers/Constants");
 
 // Endpoint to search for all addresses  
 router.get('/addresses', async (req, res) => {
-    const query = req.query.query; // Get the search query from the request query parameters
+    const query = req.query.query;
 
     if (!query) {
         return res.status(400).json({ error: 'No query provided' });
