@@ -12,13 +12,12 @@ router.get('/addresses', async (req, res) => {
     }
 
     try {
-        const addresses = await getAllAddresses(query);
+        const addresses = await getAllAddresses(query);p
         res.json(addresses);
     } catch (error) {
         console.error('Error:', error.message);
         res.status(500).json({ error: 'Failed to retrieve addresses' });
     }
 });
-
 
 module.exports = router;

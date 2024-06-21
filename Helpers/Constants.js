@@ -1,10 +1,11 @@
-const axios = require('axios');  
+1
 const geocoder = require('node-open-geocoder');
  // OpenStreetMap API endpoint
  const OSM_API_URL = 'https://nominatim.openstreetmap.org/search';
 const options = {
     timeout:100000
 }
+
 const geocodeAddress = (address) => {
     return new Promise((resolve, reject) => {
         geocoder()
@@ -21,6 +22,7 @@ const geocodeAddress = (address) => {
             });
     });
 };
+
 const getAllAddresses = (query) => {
     return new Promise((resolve, reject) => {
         geocoder()

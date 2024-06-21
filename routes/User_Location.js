@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const UserProfile= require("../models/UserProfile");
 
-
-
 // Endpoint to save user home location
 router.post('/user/location', async (req, res) => {
     const { userId, address, category } = req.body;
@@ -78,7 +76,6 @@ router.put('/user/location', async (req, res) => {
     }
 });
 
-
 // Endpoint to get user location
 router.get('/user/location/:userId', async(req, res) => {
   const userId = req.params.userId;
@@ -98,7 +95,5 @@ router.get('/user/location/:userId', async(req, res) => {
     res.status(500).json({ error: 'Failed to retrieve User Profile' });
 }
 });
-
-
 
 module.exports = router;

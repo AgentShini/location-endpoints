@@ -13,8 +13,6 @@ router.get('/distance', async(req, res) => {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    
-  
     try {
         // Geocode rider and customer addresses
        
@@ -32,7 +30,7 @@ router.get('/distance', async(req, res) => {
 
         // Convert distance from meters to kilometers
         const distanceInKm = geolib.convertDistance(distance, 'km');
-
+        
         res.json({ distanceInMeters: distance, distanceInKm });
     } catch (error) {
         console.error('Error:', error.message);
