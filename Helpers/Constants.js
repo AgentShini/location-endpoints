@@ -1,6 +1,7 @@
 //const jwt = require('jsonwebtoken');
-const Demand = require('../models/Scheduled_Demand')
 const opencage = require('opencage-api-client');
+const NotFoundError = require('../src/errors/NotFoundError');
+
 
 const geocodeAddress = async (address) => {
   try {
@@ -54,7 +55,9 @@ const getAllAddresses = async (query) => {
     const data = response.results;
 
     if (data.length === 0) {
-      console.error('Error:', error.message);
+      // error('Error:', error.message);
+      throw new NotFoundError('Address not Found')
+
     }
 
     const addresses = data.map(item => ({
@@ -63,8 +66,7 @@ const getAllAddresses = async (query) => {
 
     return addresses;
   } catch (error) {
-    console.error('Error:', error.message);
-    //throw new Error( error.message); // Re-throw for route handler
+   throw new NotFoundError(error.message)
   }
 };
 
@@ -75,7 +77,7 @@ const getSingleAddress = async (query) => {
     const data = response.results;
 
     if (data.length === 0) {
-      console.error('Error:', error.message);
+      //throw new NotFoundError('Address not Found')
     }
 
     const address = {
@@ -84,62 +86,14 @@ const getSingleAddress = async (query) => {
 
     return address;
   } catch (error) {
-    console.error('Error:', error.message);
-    //throw new Error( error.message); // Re-throw for route handler
+    //throw new NotFoundError(error.message)
+    //console.error('Error:', error.message);
   }
 };
 
 
 
-function verifyJWT(req, res, next) {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Unauthorized: Missing JWT token' });
-  }
-
-  const token = authHeader.split(' ')[1];
-
-  try {
-    const decoded = jwt.verify(token, 'YOUR_SECRET_KEY');
-    req.userID = decoded.userId;
-    next();
-  } catch (error) {
-    return res.status(403).json({ error: 'Invalid JWT token' });
-  }
-}
-
-
-
-async function scheduleDemand(userId, location, proposedDateTime, amount, fuelType) {
-  try {
-    
-    const demand = new Demand({
-      userId,
-      location,
-      proposedDateTime: new Date(proposedDateTime),
-      amount,
-      fuelType
-    });
-
-    await demand.save();
-
-    return { message: 'Demand scheduled successfully', demand };
-  } catch (error) {
-    console.error('Error scheduling demand:', error.message);
-  }
-}
-
-
-
-
-
-
-
-
-
-
 
 module.exports = {
-    getAllAddresses, haversineDistance, getSingleAddress,geocodeAddress, verifyJWT,scheduleDemand,
+    getAllAddresses, haversineDistance, getSingleAddress,geocodeAddress
 }

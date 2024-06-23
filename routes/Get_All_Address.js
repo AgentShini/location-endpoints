@@ -1,24 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const {getAllAddresses} = require("../Helpers/Constants");
+const AddressController = require("../Controller/AddressController");
 
 
 // Endpoint to search for all addresses  
-router.get('/addresses', async (req, res) => {
-    const query = req.query.query;
-
-    if (!query) {
-        return res.status(400).json({ error: 'No query provided' });
-    }
-
-    try {
-        const addresses = await getAllAddresses(query);
-        res.json(addresses);
-    } catch (error) {
-        console.error('Error:', error.message);
-        res.status(500).json({ error: 'Failed to retrieve addresses' });
-    }
-});
+router.get('/addresses', AddressController.getAddresses);
 
 
 module.exports = router;

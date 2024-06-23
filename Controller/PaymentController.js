@@ -1,9 +1,14 @@
+const NotFoundError = require("../src/errors/NotFoundError");
+const AuthorizationError = require("../src/errors/AuthorizationError");
 require('dotenv').config();
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const https = require('https');
 const Payment = require("../models/Payment");
 const UserProfile = require("../models/UserProfile");
 const Demand = require("../models/Scheduled_Demand");
+const parser = require("../src/services/request-validator");
+const response = require("../src/services/api-response"); 
+
 
 
 const payStack = {
@@ -22,7 +27,7 @@ const payStack = {
 
       const payment = await Payment.findOne({paystackReference:reference});
       if(!payment){
-        return res.status(404).json({message:"Reference does not exist"});
+        return response.error(res, new NotFoundError("Order does not Exist")); 
       }
   
       const request = https.request(options, (response) => {
@@ -38,18 +43,21 @@ const payStack = {
             await payment.updateOne({status:parsedData.data.status});
             res.status(response.statusCode).json(parsedData);
           } catch (error) {
-            res.status(500).json({ error: 'Failed to parse response from Paystack' });
+           // console.error('Error:', error.message);
+           return response.error(res, error); 
           }
         });
       });
   
       request.on('error', (error) => {
-        res.status(500).json({ error: error.message });
+        //console.error('Error:', error.message);
+        return response.error(res, error); 
       });
   
       request.end();
     } catch (error) {
-      res.status(500).json({ error: 'An unexpected error occurred' });
+     // console.error('Error:', error.message);
+     return response.error(res, error); 
     }
   },
 
@@ -58,19 +66,19 @@ const payStack = {
     try {
 
       const ID = req.body.ID
+
       const demand = await Demand.findOne({_id:ID})
       if(!demand){
-        return res.status(404).json({ error: 'Order not found' });
-
+        return response.error(res, new NotFoundError("Order does not Exist")); 
       }
       const userId = demand.userId;
       const userProfile = await UserProfile.findOne({ userId });
       if (!userProfile) {
-        return res.status(404).json({ error: 'User not found' });
+        return response.error(res, new NotFoundError("User does not Exist")); 
     }
 
     if(demand.status == 'cancelled'){
-      return res.status(403).json({error:'Order has been cancelled'});
+      return response.error(res, new AuthorizationError("Order has been Cancelled"))
     }
 
     const amount = demand.amount;
@@ -114,19 +122,19 @@ const payStack = {
            return res.send(response.data.authorization_url);
       
           } catch (error) {
-            console.error('Error parsing response:', error.message);
+           // console.error('Error:', error.message);
+           return response.error(res, error); 
           }
         })
       }).on('error', error => {
-        console.error(error)
+       // console.error(error)
       })
       clientReq.write(params)
       clientReq.end()
       
     } catch (error) {
-      // Handle any errors that occur during the request
-      console.error(error);
-      res.status(500).json({ error: 'An error occurred' });
+     // console.error('Error:', error.message);
+     return response.error(res, error); 
     }
   },
 
@@ -134,21 +142,22 @@ const payStack = {
   acceptPayment: async(req, res) => {
     try {
 
-      const amount = req.body.amount;
-      const userId = req.body.userId;
-      const fuelType = req.body.fuelType;
+      const { amount, userId, fuelType } = req.body;
+
+      const parsedAmount = parser('amount',amount).type('integer').required().parseAndBuild(amount);
+      const parsedFuelType = parser('fuelType',fuelType).type('string').required().parseAndBuild(fuelType);
 
       
 
-      const userProfile = await UserProfile.findOne({ userId });
+      const userProfile = await UserProfile.findOne({userId});
       if (!userProfile) {
-        return res.status(404).json({ error: 'User not found' });
+        return response.error(res, new NotFoundError("User does not Exist")); 
     }
     const email = userProfile.email;
 
       const params = JSON.stringify({
         "email": email,
-        "amount": amount * 100
+        "amount": parsedAmount * 100
       })
       // options
       const options = {
@@ -173,9 +182,9 @@ const payStack = {
             
             const payment = new Payment({
               email:email,
-              amount:amount,
+              amount:parsedAmount,
               userId:userId,
-              fuelType:fuelType,
+              fuelType:parsedFuelType,
               paystackReference:response.data.reference
             });
 
@@ -183,20 +192,21 @@ const payStack = {
            return res.send(response.data.authorization_url);
       
           } catch (error) {
-            console.error('Error parsing response:', error.message);
+            return response.error(res, error); 
+           // console.error('Error parsing response:', error.message);
           }
         })
       }).on('error', error => {
-        console.error(error)
+        return response.error(res, error); 
+       // console.error(error)
       })
       clientReq.write(params)
       clientReq.end()
       
     } catch (error) {
-      // Handle any errors that occur during the request
-      console.error(error);
-      res.status(500).json({ error: 'An error occurred' });
-    }
+    //  console.error('Error:', error.message);
+    return response.error(res, error); 
+  }
   },
 }
 
